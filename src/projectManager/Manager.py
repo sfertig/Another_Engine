@@ -7,6 +7,8 @@ from PyScene import Vector2D
 
 from ..utils import *
 from ..Net import Net
+from ..build.Build import BuildProject
+from ..runner.Run import Runner
 
 RELOAD = False
 
@@ -84,8 +86,10 @@ class TopBar:
             data["project_name"] = n
             data["version"] = Net.VERSION
             data["window"]["title"] = n
-            with open(p+n+"_project.json", "w") as f:
+            with open(p+"_project.json", "w") as f:
                 json.dump(data, f, indent=4)
+            with open(p+"build.py", "w") as f:
+                f.write("")
 
 
 class ProjectList:
@@ -158,7 +162,9 @@ class Options:
         self.btns: dict[str, btn] = {
             "edit": self.pan.add_object(btn(10, 40, i, 30, [29, 34, 41], "Edit", (255, 255, 255), 30, "white", -1, 2, sub=self.pan.sub)),
             "run": self.pan.add_object(btn(10, 80, i, 30, [29, 34, 41], "Run", (255, 255, 255), 30, "white", -1, 2, sub=self.pan.sub)),
-            "del": self.pan.add_object(btn(10, 160, i, 30, [29, 34, 41], "Delete", (255, 0, 0), 30, "white", -1, 2, sub=self.pan.sub)),
+            "build": self.pan.add_object(btn(10, 120, i, 30, [29, 34, 41], "Build", (255, 255, 255), 30, "white", -1, 2, sub=self.pan.sub)),
+                        
+            "del": self.pan.add_object(btn(10, 200, i, 30, [29, 34, 41], "Delete", (255, 0, 0), 30, "white", -1, 2, sub=self.pan.sub)),
         }
 
     def update(self):
@@ -166,9 +172,14 @@ class Options:
             btn.update()
 
         #btn interactions
-        if self.btns["run"].pressed: pass
+        if self.btns["run"].pressed: self._run()
         elif self.btns["edit"].pressed: pass
+        elif self.btns["build"].pressed: BuildProject(self.name+".engine").gen()
         elif self.btns["del"].pressed: self._del()
+
+    def _run(self):
+        BuildProject(self.name+".engine").gen()
+        Runner(self.name+".engine")
 
     def _del(self):
         print("del")
