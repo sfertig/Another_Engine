@@ -3,6 +3,7 @@ from PyScene import Vector2D
 
 from .subscreen import SubScreen
 from ..Net import Net
+from .input import Keys
 
 import inspect
 
@@ -222,14 +223,17 @@ class btn:
         self.toggle = toggle
         self.hovered = False
         self.pressed = False
-        self.tRect = toggleRect
+        self.tRect = toggleRect or Net.screen_rect
         self.sub = sub
 
         self.text = Text(font, text, textColor, Vector2D(x + w / 2, y + h / 2))
+        self.font = font
+        self.Tcolor = textColor
 
     def update(self):
         if self.toggle: self._toggle()
         else: self._hover()
+        return self.pressed
 
     def _mpos_hover(self):
         if self.sub: mpos = self.sub.local_mouse_pos().to_int()
@@ -239,7 +243,12 @@ class btn:
         #print(mpos, self.hovered)
 
     def _toggle(self):
-        pass
+        self._mpos_hover()
+        if self.pressed: self.w = self.maxw
+        else: self.w = self.minw
+        if self.tRect.collidepoint(pygame.mouse.get_pos()): 
+            if Net.click and self.hovered: self.pressed = not self.pressed
+            elif Net.click and not self.hovered: self.pressed = False
 
     def _hover(self):
         self._mpos_hover()
@@ -252,5 +261,34 @@ class btn:
         pygame.draw.rect(screen, self.bg, self.rect)
         pygame.draw.rect(screen, self.border, self.rect, self.w)
         self.text.render(screen)
+
+#region Text Input
+
+class TextInput:
+    def __init__(self, btn):
+        self.btn = btn
+        self.buffer = 0
+
+    def update(self):
+        self.btn.update()
+
+        if self.btn.pressed:
+            if Keys.is_pressed(Keys.enter) or Keys.is_pressed(Keys.escape): self.btn.pressed = False
+            else:
+                text = self.btn.text.text
+                #done = False
+                for event in Net.events:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_BACKSPACE: continue #text = text[:-1]
+                        elif event.key == pygame.K_RETURN or event.key == pygame.K_ESCAPE: continue
+                        else: text += event.unicode
+                if Keys.is_held(Keys.backspace) and self.buffer == 0: 
+                    text = text[:-1]
+                    self.buffer = 15
+                elif not Keys.is_held(Keys.backspace): self.buffer = 0
+                if text != self.btn.text.text: self.btn.text.set_text(text)
+
+    def render(self, screen):
+        self.btn.render(screen)
 
 

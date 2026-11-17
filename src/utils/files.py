@@ -15,3 +15,21 @@ def init_save_dir():
     os.makedirs(path, exist_ok=True)
 
     return exists
+
+DEFAULTPROJECT = {
+  "project_name": "__name__",
+  "version": "0.0.1",
+  "export": {
+    "windows_windowed": True
+  },
+  "window": {
+    "width": 640,
+    "height": 360,
+    "fullscreen": False,
+    "fps": 60,
+    "bg_color": "darkblue",
+    "title": "__pyscene_default__"
+  },
+  "include_splashscreen": True,
+  "main_scene": "" 
+}

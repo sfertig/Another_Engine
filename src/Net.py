@@ -3,6 +3,7 @@ import os
 import sys
 from PyScene import Vector2D
 
+
 class _Net:
     def __init__(self):
         self.screen: pygame.Surface = None
@@ -20,6 +21,8 @@ class _Net:
 
         self.cursor = pygame.SYSTEM_CURSOR_ARROW
         self._last_cursor = None
+
+        self.VERSION = "0.0.1"
 
     def reset(self):
         pygame.quit()
@@ -46,6 +49,14 @@ class _Net:
         if self.cursor != self._last_cursor:
             pygame.mouse.set_cursor(self.cursor)
             self._last_cursor = self.cursor
+
+    def folder_name(self, name):
+        _text = name
+        #make the text folder safe
+        for char in ["\\", "/", ":", "*", "?", "\"", "<", ">", "|", ".", " ", "#", "%", "$", "&", "@", "!", "^"]:
+            _text = _text.replace(char, "_")
+        _text += ".engine"
+        return _text
 
 
 Net: _Net = _Net()
