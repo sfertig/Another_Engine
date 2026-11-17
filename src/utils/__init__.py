@@ -7,5 +7,5 @@ __all__ = [
     "get_path", "init_save_dir", "DEFAULTPROJECT",
     "SubScreen",
     "Pannel", "Text", "btn", "TextInput",
-    "input",
+    "Keys",
 ]

@@ -9,12 +9,14 @@ from ..utils import *
 from ..Net import Net
 from ..build.Build import BuildProject
 from ..runner.Run import Runner
+from ..editor.Run import RunEditor
 
 RELOAD = False
 
 class ProjectManager:
     def __init__(self):
-        pygame.init()
+        Net.reset()
+        Net.manager = self.__class__
         #screen and basics
         Net.screen_size = Vector2D(1024, 600)
         Net.screen = pygame.display.set_mode(Net.screen_size.to_int())
@@ -173,13 +175,16 @@ class Options:
 
         #btn interactions
         if self.btns["run"].pressed: self._run()
-        elif self.btns["edit"].pressed: pass
+        elif self.btns["edit"].pressed: self._edit()
         elif self.btns["build"].pressed: BuildProject(self.name+".engine").gen()
         elif self.btns["del"].pressed: self._del()
 
     def _run(self):
         BuildProject(self.name+".engine").gen()
         Runner(self.name+".engine")
+
+    def _edit(self):
+        RunEditor(self.name)
 
     def _del(self):
         print("del")

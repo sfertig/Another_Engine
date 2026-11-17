@@ -2,6 +2,7 @@ import pygame
 import os
 import sys
 from PyScene import Vector2D
+import json
 
 
 class _Net:
@@ -24,10 +25,11 @@ class _Net:
 
         self.VERSION = "0.0.1"
 
+        self.manager = None # <- to return to manager after editor
+
     def reset(self):
         pygame.quit()
         pygame.init()
-        return _Net()
 
     def update(self):
         self.cursor = pygame.SYSTEM_CURSOR_ARROW
@@ -60,4 +62,24 @@ class _Net:
 
 
 Net: _Net = _Net()
+
+#editor stuff
+
+class _project:
+    def __init__(self, name: str):
+        self.name = name
+        self.folder = name+".engine"
+        self.path = f"{Net.save_dir}/{self.folder}/"
+
+        #load json data
+        self.load()
+
+    def load(self):
+        with open(self.path+"_project.json", "r") as f:
+            self.project = json.load(f)
+        #later load scenes and objs
+
+    def save(self):
+        with open(self.path+"_project.json", "w") as f:
+            json.dump(self.project, f, indent=4)
 

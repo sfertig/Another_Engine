@@ -30,4 +30,4 @@ def Runner(project_name):
         creationflags=subprocess.CREATE_NEW_CONSOLE
     )
 
-    print("[Runner] - Project running: " + project_name)
+    print("[Runner] - Project running: " + project_name.split(".")[0])

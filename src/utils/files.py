@@ -27,9 +27,10 @@ DEFAULTPROJECT = {
     "height": 360,
     "fullscreen": False,
     "fps": 60,
-    "bg_color": "darkblue",
+    "bg_color": [0, 0, 255],
     "title": "__pyscene_default__"
   },
   "include_splashscreen": True,
-  "main_scene": "" 
+  "main_scene": "",
+  "dirty": False,
 }
