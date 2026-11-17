@@ -31,14 +31,16 @@ class _Net:
         pygame.quit()
         pygame.init()
 
-    def update(self):
+    def update(self, esc=True):
+        _esc = False
         self.cursor = pygame.SYSTEM_CURSOR_ARROW
         self.click = False
         self.events = pygame.event.get()
         self.dt = self.clock.tick(60) / 1000.0
         for event in self.events:
             if event.type == pygame.QUIT:
-                sys.exit()
+                if esc: sys.exit()
+                else: _esc = True
             elif event.type == pygame.MOUSEBUTTONDOWN: 
                 if event.button == 1: 
                     self.mouse_down = True
@@ -46,6 +48,7 @@ class _Net:
                 if event.button == 1: 
                     self.mouse_down = False
                     self.click = True
+        return _esc
 
     def mouse_cursor(self):
         if self.cursor != self._last_cursor:
@@ -80,6 +83,13 @@ class _project:
         #later load scenes and objs
 
     def save(self):
-        with open(self.path+"_project.json", "w") as f:
-            json.dump(self.project, f, indent=4)
+        self._saveFile(self.project, self.path+"_project.json")
+
+    def _saveFile(self, data, path):
+        if data["changed"]:
+            data["changed"] = False
+            name = path.split("/")[-2].split(".")[0]
+            print(f"Saved {name}")
+            with open(path, "w") as f:
+                json.dump(data, f, indent=4)
 

@@ -32,5 +32,6 @@ DEFAULTPROJECT = {
   },
   "include_splashscreen": True,
   "main_scene": "",
-  "dirty": False,
+  "dirty": True,
+  "changed": True
 }
