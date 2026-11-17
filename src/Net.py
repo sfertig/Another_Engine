@@ -21,6 +21,11 @@ class _Net:
         self.cursor = pygame.SYSTEM_CURSOR_ARROW
         self._last_cursor = None
 
+    def reset(self):
+        pygame.quit()
+        pygame.init()
+        return _Net()
+
     def update(self):
         self.cursor = pygame.SYSTEM_CURSOR_ARROW
         self.click = False
@@ -43,5 +48,5 @@ class _Net:
             self._last_cursor = self.cursor
 
 
-Net = _Net()
+Net: _Net = _Net()
 

@@ -4,6 +4,8 @@ from PyScene import Vector2D
 from .subscreen import SubScreen
 from ..Net import Net
 
+import inspect
+
 #region Pannel
 class Pannel:
     def __init__(self, x, y, w, h, bgColor, borderColor=None, borderPadding=2, displaySurface: pygame.Surface = None, parent=None):
@@ -124,7 +126,7 @@ class Pannel:
             self.screen = self.sub.screen
 
 
-    def render(self, cam: Vector2D = Vector2D(0, 0)):
+    def render(self, cam: Vector2D = Vector2D(0, 0), render_sub=True):
         self.update()
         self.sub.clear()
 
@@ -136,8 +138,10 @@ class Pannel:
         self.sub.render(cam)
 
     def add_object(self, obj):
-        if hasattr(obj, 'render') and obj not in self.objs:
-            self.objs.append(obj)
+        if hasattr(obj, 'render'):
+            if obj not in self.objs and "screen" in inspect.signature(obj.render).parameters:
+                self.objs.append(obj)
+        return obj
     
     def remove_object(self, obj):
         if obj in self.objs:
@@ -200,4 +204,53 @@ class Text:
 
     def render(self, screen):
         screen.blit(self.surface, self.rect)
+
+#region Btn
+
+class btn:
+    def __init__(self, x, y, w, h, bgColor, text="", textColor=(255, 255, 255), font=30, 
+                 borderColor=None, minw=2, maxw=5, toggle=False, toggleRect=None, sub=None):
+        self.pos = Vector2D(x, y)
+        self.dim = Vector2D(w, h)
+        self.bg = bgColor
+        self.border = borderColor or bgColor
+        self.minw = minw
+        self.maxw = maxw
+        self.w = minw
+
+        self.rect = pygame.Rect(x, y, w, h)
+        self.toggle = toggle
+        self.hovered = False
+        self.pressed = False
+        self.tRect = toggleRect
+        self.sub = sub
+
+        self.text = Text(font, text, textColor, Vector2D(x + w / 2, y + h / 2))
+
+    def update(self):
+        if self.toggle: self._toggle()
+        else: self._hover()
+
+    def _mpos_hover(self):
+        if self.sub: mpos = self.sub.local_mouse_pos().to_int()
+        else: mpos = pygame.mouse.get_pos()
+
+        self.hovered = self.rect.collidepoint(mpos)
+        #print(mpos, self.hovered)
+
+    def _toggle(self):
+        pass
+
+    def _hover(self):
+        self._mpos_hover()
+        if self.hovered: self.w = self.maxw
+        else: self.w = self.minw
+        if Net.click and self.hovered: self.pressed = True
+        else: self.pressed = False
+
+    def render(self, screen):
+        pygame.draw.rect(screen, self.bg, self.rect)
+        pygame.draw.rect(screen, self.border, self.rect, self.w)
+        self.text.render(screen)
+
 
