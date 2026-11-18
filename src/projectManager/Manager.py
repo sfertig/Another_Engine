@@ -82,6 +82,7 @@ class TopBar:
             os.mkdir(p+"assets")
             os.mkdir(p+"objects")
             os.mkdir(p+"scenes")
+            os.mkdir(p+"_buidcache_")
             #make engine file
             n = name.split(".")[0]
             data = DEFAULTPROJECT.copy()

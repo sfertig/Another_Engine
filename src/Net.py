@@ -4,6 +4,8 @@ import sys
 from PyScene import Vector2D
 import json
 
+from .utils import DEFAULTPROJECT
+
 
 class _Net:
     def __init__(self):
@@ -76,6 +78,7 @@ class _project:
 
         #load json data
         self.load()
+        self._updateProject()
 
     def load(self):
         with open(self.path+"_project.json", "r") as f:
@@ -92,4 +95,33 @@ class _project:
             print(f"Saved {name}")
             with open(path, "w") as f:
                 json.dump(data, f, indent=4)
+
+    def _updateProject(self): #updates files with new keys
+        #if self.project["version"] == Net.VERSION: return
+
+        #ensure all folders exist
+        for folder in ["_buildcache_", "objects", "scenes", "assets"]:
+            if folder not in os.listdir(self.path):
+                os.mkdir(self.path+folder)
+
+        # start updating
+        self.project = self._update_file(self.project, DEFAULTPROJECT)
+
+    def _update_file(self, data, newdata) -> dict:
+        for key, value in newdata.items():
+            # Check if the key exists in data and BOTH values are dictionaries
+            if (
+                key in data
+                and isinstance(data[key], dict)
+                and isinstance(value, dict)
+            ):
+                # Recursively update the nested dictionary
+                self._update_file(data[key], value)
+            else:
+                # Otherwise, add the new key or overwrite the existing non-dict value
+                data[key] = value
+
+        return data
+
+
 

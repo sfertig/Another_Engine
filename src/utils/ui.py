@@ -210,7 +210,8 @@ class Text:
 
 class btn:
     def __init__(self, x, y, w, h, bgColor, text="", textColor=(255, 255, 255), font=30, 
-                 borderColor=None, minw=2, maxw=5, toggle=False, toggleRect=None, sub=None):
+                 borderColor=None, minw=2, maxw=5, toggle=False, toggleRect=None, sub=None, 
+                 bor=-1, toggleSelf=True):
         self.pos = Vector2D(x, y)
         self.dim = Vector2D(w, h)
         self.bg = bgColor
@@ -218,6 +219,7 @@ class btn:
         self.minw = minw
         self.maxw = maxw
         self.w = minw
+        self.b = bor
 
         self.rect = pygame.Rect(x, y, w, h)
         self.toggle = toggle
@@ -229,6 +231,8 @@ class btn:
         self.text = Text(font, text, textColor, Vector2D(x + w / 2, y + h / 2))
         self.font = font
         self.Tcolor = textColor
+
+        self.toggleSelf = toggleSelf
 
     def update(self):
         if self.toggle: self._toggle()
@@ -247,7 +251,9 @@ class btn:
         if self.pressed: self.w = self.maxw
         else: self.w = self.minw
         if self.tRect.collidepoint(pygame.mouse.get_pos()): 
-            if Net.click and self.hovered: self.pressed = not self.pressed
+            if Net.click and self.hovered: 
+                if self.toggleSelf: self.pressed = not self.pressed
+                else: self.pressed = True
             elif Net.click and not self.hovered: self.pressed = False
 
     def _hover(self):
@@ -258,8 +264,8 @@ class btn:
         else: self.pressed = False
 
     def render(self, screen):
-        pygame.draw.rect(screen, self.bg, self.rect)
-        pygame.draw.rect(screen, self.border, self.rect, self.w)
+        pygame.draw.rect(screen, self.bg, self.rect, 0, self.b)
+        pygame.draw.rect(screen, self.border, self.rect, self.w, self.b)
         self.text.render(screen)
 
 #region Text Input
