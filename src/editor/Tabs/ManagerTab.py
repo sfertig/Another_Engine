@@ -64,17 +64,31 @@ class FilePannel:
         self.pan.add_object(Line(0, 45, self.pan.dim.x, 45))
 
         self.create = self.pan.add_object(btn(5, 5, 35, 35, [29, 34, 41], "+", "white", 40, "white", -1, 2, sub=self.pan.sub))
+        self.cting = False
+        self.input: CreateFile = None
 
-    def handle_scroll(self):
-        s = Net.scroll*10
+    def handle_scroll(self, s=Net.scroll*10):
         if s == 0: return
+
+        #if can scroll
+        if s > 0:
+            if self.objs[0].pos.y+s > 70: return
+        else:
+            if self.objs[-1].pos.y+s < self.pan.dim.y-70: return
+            
         for obj in self.objs:
             obj.scroll(s)
+
+    def _create(self):
+        if self.cting: return
+        self.cting = True
+        self.handle_scroll(9999) #scroll to bottom
+        self.input = self.pan.add_object(CreateFile(self.objs[-1].pos.y+60, self.pan))
 
     def update(self):
         mpos = pygame.mouse.get_pos()
         if self.create.update() or (self._rect.collidepoint(mpos) and (Keys.is_held(Keys.control) and Keys.is_pressed(Keys.a))):
-            pass
+            self._create()
 
         self.handle_scroll()
 
