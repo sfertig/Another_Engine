@@ -297,4 +297,29 @@ class TextInput:
     def render(self, screen):
         self.btn.render(screen)
 
+#region Line
+
+class Line:
+    def __init__(self, x1, y1, x2, y2, color=(0, 0, 0), w=1):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+        self.color = color
+        self.w = w
+
+    def render(self, screen):
+        pygame.draw.line(screen, self.color, (self.x1, self.y1), (self.x2, self.y2), self.w)
+
+#class Rect
+
+class Rect:
+    def __init__(self, x, y, w, h, color, width=0, b=1):
+        self.rect = pygame.Rect(x, y, w, h)
+        self.color = color
+        self.width = width
+        self.b = b
+
+    def render(self, screen):
+        pygame.draw.rect(screen, self.color, self.rect, self.width, self.b)
 

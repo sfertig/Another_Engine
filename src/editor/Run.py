@@ -63,6 +63,7 @@ def RunEditor(projectName):
         top.render()
         tabs.render()
 
+        #pygame.draw.circle(Net.screen, (255, 0, 0), (0, Net.screen_size.y), 10) #test screen size(s)
         Net.mouse_cursor()
         pygame.display.flip()
 

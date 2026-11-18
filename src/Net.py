@@ -18,6 +18,8 @@ class _Net:
 
         self.mouse_down = False
         self.click = False
+        self._y = 0
+        self.scroll = 0
 
         #file stuff
         self.save_dir: str = None
@@ -34,6 +36,7 @@ class _Net:
         pygame.init()
 
     def update(self, esc=True):
+        self.scroll = 0
         _esc = False
         self.cursor = pygame.SYSTEM_CURSOR_ARROW
         self.click = False
@@ -50,6 +53,7 @@ class _Net:
                 if event.button == 1: 
                     self.mouse_down = False
                     self.click = True
+            elif event.type == pygame.MOUSEWHEEL: self.scroll = -event.y
         return _esc
 
     def mouse_cursor(self):
@@ -80,13 +84,32 @@ class _project:
         self.load()
         self._updateProject()
 
+        #reload flags
+        self.RLD_MANAGER = False #reloads managerTab fo new / del files
+
     def load(self):
         with open(self.path+"_project.json", "r") as f:
             self.project = json.load(f)
-        #later load scenes and objs
+        #load scenes
+        self.scenes = {}
+        for scene in os.listdir(self.path+"scenes/"):
+            with open(self.path+"scenes/"+scene, "r") as f:
+                self.scenes[scene.split(".")[0]] = json.load(f)
+
+        #objs
+        self.objects = {}
+        for obj in os.listdir(self.path+"objects/"):
+            with open(self.path+"objects/"+obj, "r") as f:
+                self.objects[obj.split(".")[0]] = json.load(f)
 
     def save(self):
         self._saveFile(self.project, self.path+"_project.json")
+        
+        """for scene, data in self.scenes.items():
+            self._saveFile(data, self.path+"scenes/"+scene+".json") 
+
+        for obj, data in self.objects.items():
+            self._saveFile(data, self.path+"objects/"+obj+".json")"""
 
     def _saveFile(self, data, path):
         if data["changed"]:
