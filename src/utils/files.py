@@ -35,3 +35,18 @@ DEFAULTPROJECT = {
   "dirty": True,
   "changed": True
 }
+
+DEFAULTSCENE = {
+    "name": "__name__",
+    "objects": {},
+    "imports": [],
+    "dirty": True,
+    "changed": True
+}
+
+DEFAULTOBJECT = {
+    "name": "__name__",
+    "imports": [],
+    "dirty": True,
+    "changed": True
+}

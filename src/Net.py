@@ -4,7 +4,7 @@ import sys
 from PyScene import Vector2D
 import json
 
-from .utils import DEFAULTPROJECT
+from .utils import DEFAULTPROJECT, DEFAULTSCENE, DEFAULTOBJECT
 
 
 class _Net:
@@ -86,6 +86,7 @@ class _project:
 
         #reload flags
         self.RLD_MANAGER = False #reloads managerTab fo new / del files
+        self.RLD_SELF = False #reloads self
 
     def load(self):
         with open(self.path+"_project.json", "r") as f:
@@ -102,14 +103,31 @@ class _project:
             with open(self.path+"objects/"+obj, "r") as f:
                 self.objects[obj.split(".")[0]] = json.load(f)
 
+    def _save_dirty(self):
+        #print("_save_dirty")
+        self._saveFile(self.project, self.path+"_project.json")
+                
+        for scene, data in self.scenes.items():
+            if data["dirty"]:
+                data["dirty"] = False
+                data["changed"] = True
+                self._saveFile(data, self.path+"scenes/"+scene+".json")
+
+        for obj, data in self.objects.items():
+            if data["dirty"]:
+                data["dirty"] = False
+                data["changed"] = True
+                self._saveFile(data, self.path+"objects/"+obj+".json")
+
     def save(self):
         self._saveFile(self.project, self.path+"_project.json")
         
-        """for scene, data in self.scenes.items():
+        for scene, data in self.scenes.items():
             self._saveFile(data, self.path+"scenes/"+scene+".json") 
 
         for obj, data in self.objects.items():
-            self._saveFile(data, self.path+"objects/"+obj+".json")"""
+            self._saveFile(data, self.path+"objects/"+obj+".json")
+   
 
     def _saveFile(self, data, path):
         if data["changed"]:
@@ -155,7 +173,10 @@ class _project:
         return False
 
     def new(self, name, _type_):
-        data = {}
+        data = DEFAULTSCENE if _type_ == "scene" else DEFAULTOBJECT
+        data["name"] = name
+        data["dirty"] = True
+        data["changed"] = True
 
         path = self.path+_type_+"s/"+name+".json"
         with open(path, "w") as f:
@@ -169,6 +190,10 @@ class _project:
 
         path = self.path+_type_+"s/"+name+".json"
         os.remove(path)
+
+        cPath = self.path+"_buildcache_/"+name+".py"
+        if os.path.exists(cPath):
+            os.remove(cPath)
 
         del getattr(self, _type_+"s")[name]
         print("[Project] - "+_type_+" deleted: "+name)

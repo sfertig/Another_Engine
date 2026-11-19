@@ -20,11 +20,18 @@ class TopBar:
         self.build = self.pan.add_object(btn(Net.screen_size.x-140, 2, 120, 46, [29, 34, 41], "Build (f6)", (255, 255, 255), 40, "white", -1, 2, sub=self.pan.sub))
 
     def update(self):
-        if self.run.update():
+
+        if self.run.update() or Keys.is_pressed(Keys.f5):
+            Project.save()
             BuildProject(Project.folder).gen()
+            Project._save_dirty()
             Runner(Project.folder)
-        if self.build.update():
+        if self.build.update() or Keys.is_pressed(Keys.f6):
+            Project.save()
             BuildProject(Project.folder).gen()
+            Project._save_dirty()
+
+        if Keys.is_pressed(Keys.f1) or (Keys.is_held(Keys.control) and Keys.is_pressed(Keys.s)): Project.save()
 
     def render(self):
         self.pan.render()

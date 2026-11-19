@@ -40,18 +40,14 @@ def RunEditor(projectName):
         if Net.update(False):
             Project.save()
             break
+        if Project.RLD_SELF: 
+            Project.RLD_SELF = False
+            Project.load()
 
         #debug
         if Keys.is_pressed(Keys.escape): 
             Project.save()
             break
-
-        #fast Keys
-        if Keys.is_pressed(Keys.f5): 
-            BuildProject(Project.folder).gen()
-            Runner(Project.folder)
-        elif Keys.is_pressed(Keys.f6): BuildProject(Project.folder).gen()
-        elif Keys.is_pressed(Keys.f1) or (Keys.is_held(Keys.control) and Keys.is_pressed(Keys.s)): Project.save()
 
         #update
         top.update()
