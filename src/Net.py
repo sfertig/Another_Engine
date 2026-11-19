@@ -146,5 +146,31 @@ class _project:
 
         return data
 
+    def valid_name(self, name: str) -> bool:
+        if name not in self.objects and name not in self.scenes:
+            for char in name:
+                if char in ["\\", "/", ":", "*", "?", "\"", "<", ">", "|", ".", " ", "#", "%", "$", "&", "@", "!", "^"]:
+                    return False
+            return True
+        return False
+
+    def new(self, name, _type_):
+        data = {}
+
+        path = self.path+_type_+"s/"+name+".json"
+        with open(path, "w") as f:
+            json.dump(data, f, indent=4)
+
+        getattr(self, _type_+"s")[name] = data
+        print("[Project] - New "+_type_+" created: "+name)
+
+    def Delete(self, name, _type_):
+        if name not in self.scenes and name not in self.objects: return
+
+        path = self.path+_type_+"s/"+name+".json"
+        os.remove(path)
+
+        del getattr(self, _type_+"s")[name]
+        print("[Project] - "+_type_+" deleted: "+name)
 
 

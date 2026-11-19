@@ -293,6 +293,7 @@ class TextInput:
                     self.buffer = 15
                 elif not Keys.is_held(Keys.backspace): self.buffer = 0
                 if text != self.btn.text.text: self.btn.text.set_text(text)
+        return self.btn.pressed
 
     def render(self, screen):
         self.btn.render(screen)

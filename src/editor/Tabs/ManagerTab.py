@@ -36,7 +36,9 @@ class ManagerTab(Tab):
         self.scenes.update()
         self.objs.update()
 
-        if Project.RLD_MANAGER: self.gen()
+        if Project.RLD_MANAGER: 
+            self.gen()
+            Project.RLD_MANAGER = False 
 
     def _render(self):
         self.pan.render()
@@ -67,30 +69,53 @@ class FilePannel:
         self.cting = False
         self.input: CreateFile = None
 
-    def handle_scroll(self, s=Net.scroll*10):
-        if s == 0: return
-
-        #if can scroll
-        if s > 0:
-            if self.objs[0].pos.y+s > 70: return
-        else:
-            if self.objs[-1].pos.y+s < self.pan.dim.y-70: return
+    def handle_scroll(self, s):
+        s = s * 10  # Multiply the scroll speed here
+        
+        if s == 0 or len(self.objs) == 0: 
+            return
             
+        # Check bounds before scrolling
+        if s > 0: #down
+            if self.objs[0].pos.y + s > 70: 
+                return
+        else: #up
+            if self.objs[-1].pos.y + s < self.pan.dim.y - 500: 
+                return
+                
         for obj in self.objs:
             obj.scroll(s)
 
     def _create(self):
         if self.cting: return
         self.cting = True
-        self.handle_scroll(9999) #scroll to bottom
-        self.input = self.pan.add_object(CreateFile(self.objs[-1].pos.y+60, self.pan))
+        self.handle_scroll(-9999) #scroll to bottom
+        if len(self.objs) > 0: y = self.objs[-1].pos.y
+        else: y = -10
+        self.input = self.pan.add_object(CreateFile(y+60, self.pan))
+
+    def _new(self):
+        text = self.input.input.btn.text.text
+        
+        self.pan.remove_object(self.input)
+        self.cting = False
+            
+        if Project.valid_name(text): 
+            Project.new(text, self.type)
+            Project.RLD_MANAGER = True
 
     def update(self):
+
+        if self.input: 
+            if self.input.update(): self._new()
+
         mpos = pygame.mouse.get_pos()
         if self.create.update() or (self._rect.collidepoint(mpos) and (Keys.is_held(Keys.control) and Keys.is_pressed(Keys.a))):
             self._create()
 
-        self.handle_scroll()
+        if self._rect.collidepoint(mpos): self.handle_scroll(Net.scroll)
+
+        for obj in self.objs: obj.update()
 
     def render(self, screen):
         self.pan.render()
@@ -99,13 +124,15 @@ class CreateFile:
     def __init__(self, y, pan: Pannel):
         self.y = y
         self.input = TextInput(btn(
-            0, y, pan.dim.x, 50, "black",
+            0, y, pan.dim.x, 50, (25, 26, 27),
             font=40, toggle=True, sub=pan.sub
         ))
-        self.done = False
+        self.input.btn.pressed = True
+        Net.click = False
 
     def update(self):
         self.input.update()
+        return not self.input.btn.pressed
 
     def render(self, screen):
         self.input.render(screen)
@@ -120,6 +147,11 @@ class OBJ:
         self.type = _type_
 
         self.pan.add_object(Text(35, self.name, "white", Vector2D(10, self.size.y//2), "midleft"))
+        
+        self.open = self.pan.add_object(btn(self.size.x-260, 5, 80, self.size.y-10
+            , (29, 34, 41), "Open", "white", 40, "white", -1, 2, sub=self.pan.sub))
+        self._del = self.pan.add_object(btn(self.size.x-160, 5, 150, self.size.y-10
+                    , (29, 34, 41), "Del (enter)", "red", 40, "red", -1, 2, sub=self.pan.sub))
 
     def scroll(self, amount):
         self.pos.y += amount
@@ -127,7 +159,12 @@ class OBJ:
         self.pan.sub.pos.y += amount
 
     def update(self):
-        pass
+        self.open.update()
+        self._del.update()
+
+        if self._del.hovered and Keys.is_pressed(Keys.enter): 
+            Project.Delete(self.name, self.type)
+            Project.RLD_MANAGER = True
 
     def render(self, screen):
         self.pan.render()
