@@ -53,6 +53,13 @@ def RunEditor(projectName):
         top.update()
         tabs.update()
 
+        if Project.OPN_TB["check"]:
+            tabs.open(Project.OPN_TB["name"], Project.OPN_TB["type"])
+            Project.OPN_TB["check"] = False
+        elif Project.CLS_TB["check"]:
+            tabs.close(Project.CLS_TB["name"], Project.CLS_TB["type"])
+            Project.CLS_TB["check"] = False
+
         Net.screen.fill((0, 0, 0))
 
         #render

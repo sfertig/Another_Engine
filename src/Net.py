@@ -82,11 +82,13 @@ class _project:
 
         #load json data
         self.load()
-        self._updateProject()
+        #self._updateProject()
 
         #reload flags
         self.RLD_MANAGER = False #reloads managerTab fo new / del files
         self.RLD_SELF = False #reloads self
+        self.OPN_TB = {"check": False, "type": None, "name": None}
+        self.CLS_TB = {"check": False, "type": None, "name": None}
 
     def load(self):
         with open(self.path+"_project.json", "r") as f:
@@ -146,7 +148,7 @@ class _project:
                 os.mkdir(self.path+folder)
 
         # start updating
-        self.project = self._update_file(self.project, DEFAULTPROJECT)
+        #self.project = self._update_file(self.project, DEFAULTPROJECT)
 
     def _update_file(self, data, newdata) -> dict:
         for key, value in newdata.items():
@@ -187,6 +189,12 @@ class _project:
 
     def Delete(self, name, _type_):
         if name not in self.scenes and name not in self.objects: return
+
+        #check if main scene
+        if self.project["main_scene"] == name: 
+            self.project["main_scene"] = ""
+            self.project["changed"] = True
+            print("NOTICE: main scene deleted, configure one in settings")
 
         path = self.path+_type_+"s/"+name+".json"
         os.remove(path)

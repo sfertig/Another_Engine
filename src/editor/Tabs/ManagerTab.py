@@ -10,15 +10,16 @@ Project: _project = None
 
 class ManagerTab(Tab):
     def __init__(self, x, sub, rect, project: _project):
-        
-        super().__init__(x, "Tabs", sub, rect)
         global Project
         Project = project
-        self.__type = "manager"
+
+        super().__init__(x, "Tabs", sub, rect, Project, False)
+
+        self._type_ = "manager"
 
         #other stuff
         self.pan = Pannel(0, Net._y, Net.screen_size.x, Net.screen_size.y-Net._y, [29, 34, 41], displaySurface=Net.screen)
-        self.pan.add_object(Line(0, 2, self.pan.dim.x, 2))
+        self.pan.add_object(Line(20, 2, self.pan.dim.x-20, 2))
 
         self.scenes = None
         self.objs = None
@@ -165,6 +166,10 @@ class OBJ:
         if self._del.hovered and Keys.is_pressed(Keys.enter): 
             Project.Delete(self.name, self.type)
             Project.RLD_MANAGER = True
+        elif self.open.pressed:
+            Project.OPN_TB["check"] = True
+            Project.OPN_TB["name"] = self.name
+            Project.OPN_TB["type"] = self.type
 
     def render(self, screen):
         self.pan.render()

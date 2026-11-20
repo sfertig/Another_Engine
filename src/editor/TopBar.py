@@ -18,6 +18,7 @@ class TopBar:
         self.pan = Pannel(0, 0, Net.screen_size.x, 50, [29, 34, 41], displaySurface=Net.screen)
         self.run = self.pan.add_object(btn(Net.screen_size.x-300, 2, 120, 46, [29, 34, 41], "Run (f5)", (255, 255, 255), 40, "white", -1, 2, sub=self.pan.sub))
         self.build = self.pan.add_object(btn(Net.screen_size.x-140, 2, 120, 46, [29, 34, 41], "Build (f6)", (255, 255, 255), 40, "white", -1, 2, sub=self.pan.sub))
+        self.pan.add_object(Line(20, 47, Net.screen_size.x-20, 47))
 
     def update(self):
 

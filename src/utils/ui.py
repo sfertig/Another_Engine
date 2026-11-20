@@ -211,7 +211,7 @@ class Text:
 class btn:
     def __init__(self, x, y, w, h, bgColor, text="", textColor=(255, 255, 255), font=30, 
                  borderColor=None, minw=2, maxw=5, toggle=False, toggleRect=None, sub=None, 
-                 bor=-1, toggleSelf=True):
+                 bor=-1, toggleSelf=True, TextAlign="center"):
         self.pos = Vector2D(x, y)
         self.dim = Vector2D(w, h)
         self.bg = bgColor
@@ -228,11 +228,17 @@ class btn:
         self.tRect = toggleRect or Net.screen_rect
         self.sub = sub
 
-        self.text = Text(font, text, textColor, Vector2D(x + w / 2, y + h / 2))
+        self.text = Text(font, text, textColor, Vector2D(x + w / 2, y + h / 2), TextAlign)
         self.font = font
         self.Tcolor = textColor
 
         self.toggleSelf = toggleSelf
+
+    def set_x(self, x):
+        self.pos.x = x
+        self.rect = pygame.Rect(self.pos.to_int(), self.dim.to_int())
+        self.text.set_pos(Vector2D(x+self.dim.x//2, self.pos.y+self.dim.y//2))
+
 
     def update(self):
         if self.toggle: self._toggle()
