@@ -33,7 +33,8 @@ DEFAULTPROJECT = {
   "include_splashscreen": True,
   "main_scene": "",
   "dirty": True,
-  "changed": True
+  "changed": True,
+  "lastOpen": []
 }
 
 DEFAULTSCENE = {

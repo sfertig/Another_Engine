@@ -34,10 +34,14 @@ def RunEditor(projectName):
 
     top = TopBar(Project)
     tabs = TabManager(Project)
+    open_last_tabs(tabs)
+
+    
 
     print("[Editor] - loaded successfully")
     while True:
         if Net.update(False):
+            save_open_tabs(tabs) 
             Project.save()
             break
         if Project.RLD_SELF: 
@@ -45,7 +49,8 @@ def RunEditor(projectName):
             Project.load()
 
         #debug
-        if Keys.is_pressed(Keys.escape): 
+        if Keys.is_pressed(Keys.escape):
+            save_open_tabs(tabs) 
             Project.save()
             break
 
@@ -73,6 +78,21 @@ def RunEditor(projectName):
     #return
     print("[Editor] - returning to manager...")
     Net.manager().Run()
+
+def save_open_tabs(tabs: TabManager):
+    Project.project["lastOpen"] = []
+    Project.project["changed"] = True
+    for i in range(3, len(tabs.tabs)):
+        Project.project["lastOpen"].append(tabs.tabs[i]._name)
+        print(i)
+
+def open_last_tabs(tabs: TabManager):
+    for name in Project.project["lastOpen"]:
+        _type = "scene" if name in Project.scenes else "object"
+        tabs.open(name, _type)
+    tabs._deactivate(len(tabs.tabs)-1)
+    tabs._activate(2)
+
 
 
 
