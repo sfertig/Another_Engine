@@ -6,6 +6,7 @@ from ...Net import Net, _project
 from ...utils import *
 
 from .ManagerTab import ManagerTab
+from ..objs.ObjectTab import ObjTab
 from ._tab import Tab
 
 Project: _project = None
@@ -58,6 +59,7 @@ class TabManager:
             
 
     def open(self, name, _type_):
+        print(_type_)
         #check if tab already open
         for tab in self.tabs:
             if tab._name == name:
@@ -67,7 +69,9 @@ class TabManager:
 
         print("[TabManager] - New "+_type_+" tab opened: "+name)
         self._deactivate(self.lastActive)
-        self.tabs.append(self.pannel.add_object(Tab(self._y(), name, self.pannel.sub, self.r, Project)))
+
+        if _type_ == "object": self.tabs.append(self.pannel.add_object(ObjTab(self._y(), self.pannel.sub, name, self.r, Project)))
+        else: self.tabs.append(self.pannel.add_object(Tab(self._y(), name, self.pannel.sub, self.r, Project)))
         self._activate(len(self.tabs)-1)
 
     def close(self, name, _type_):
