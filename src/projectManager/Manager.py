@@ -188,10 +188,8 @@ class Options:
         RunEditor(self.name)
 
     def _del(self):
-        print("del")
         global RELOAD
         path = f"{Net.save_dir}/{self.name}.engine"
-        print(path)
         #remove folder if exists
         if os.path.exists(path):
             shutil.rmtree(path)

@@ -31,10 +31,10 @@ class CodePannel:
         for i in range(150):
             self.code.append(self.pan.add_object(CodeLine(y, self.pan, i+1, self.name, self._type)))
             y+=self.code[-1].pan.dim.y
+        self.pan.add_object(Rect(0, 0, self.pan.dim.x, self.pan.dim.y, (0, 0, 0), 2))
 
     def update(self):
         for line in self.code:
-            if line.pos.y > -50 or line.pos.y > self.pan.y+self.pan.dim.y+50: continue
             line.update()
 
     def render(self, screen):

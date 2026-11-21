@@ -59,7 +59,6 @@ class TabManager:
             
 
     def open(self, name, _type_):
-        print(_type_)
         #check if tab already open
         for tab in self.tabs:
             if tab._name == name:

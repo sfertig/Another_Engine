@@ -84,7 +84,6 @@ def save_open_tabs(tabs: TabManager):
     Project.project["changed"] = True
     for i in range(3, len(tabs.tabs)):
         Project.project["lastOpen"].append(tabs.tabs[i]._name)
-        print(i)
 
 def open_last_tabs(tabs: TabManager):
     for name in Project.project["lastOpen"]:

@@ -13,7 +13,7 @@ class Tab:
         self.pos = Vector2D(x, 0)
         #find len of text
         font = 45
-        n = f"{name}  x"
+        n = f"{name}  x"# if closebtn else name
         self.w = Text(font, n, (0, 0, 0)).surface.get_width()+20
         #print(name, self.w, x)
         self.btn = btn(x, 0, self.w, sub.dim.y, [29, 34, 41], name, "white", font, "black", -1, 3, True, rect, sub, 10, False)
@@ -45,7 +45,6 @@ class Tab:
     def _update(self): pass
     def _render(self): pass
     def _close(self): 
-        print(self.active)
         Project.CLS_TB["check"] = True
         Project.CLS_TB["name"] = self._name
         Project.CLS_TB["type"] = self._type_
