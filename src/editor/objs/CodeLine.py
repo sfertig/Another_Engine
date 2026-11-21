@@ -8,56 +8,73 @@ from ...utils import *
 Project: _project = None
 
 class CodeLine:
-    def __init__(self, y, pan: Pannel, num, name, _type):
-        self.pos = Vector2D(2, y)
-        fontSize=46
-        self.pan = Pannel(self.pos.x, y, pan.dim.x-self.pos.x*2, fontSize+4, (18, 19, 20), displaySurface=pan.sub.screen, parent=pan.sub)
+    def __init__(self, y, pan: Pannel, num, name, _type, font, fontSize, project):
+        global Project
+        Project = project
+
+        self.pos = Vector2D(0, y)
+        self.pan = Pannel(self.pos.x, y, pan.dim.x-self.pos.x, fontSize+4, (18, 19, 20), displaySurface=pan.sub.screen, parent=pan.sub)
         self.num = num
         self.name = name
         self._type = _type
 
         #test / debug
-        self.pan.add_object(btn(-50, 0, 100, fontSize+4,(18, 19, 20), str(num), font=fontSize, sub=pan.sub, TextAlign="midleft"))
+        self.pan.add_object(btn(-50, 0, 100, fontSize+4,(18, 19, 20), str(num), font=font, sub=pan.sub, TextAlign="midleft"))
         self.btn = btn(self.pos.x, y, pan.dim.x, fontSize+4, "black", sub=pan.sub, toggle=True, toggleSelf=False)
 
-        font = pygame.font.SysFont("consolas", fontSize)
         self.fntS = fontSize
-        self.text = self.pan.add_object(Text(font, "", "white", Vector2D(55, self.pan.dim.y//2), "midleft"))
-
-        self.cursorTimer = Timer(0.5, True)
-        self.cursorVis = False
-        self.cursorIndex = 0
+        self.text = self.pan.add_object(Text(font, self.get_line(num-1), "white", Vector2D(55, self.pan.dim.y//2), "midleft"))
 
         self.active = False
 
-    def update_cursor_vis(self):
-        self.cursorTimer.update()
-        if self.cursorTimer.done:
-            self.cursorVis = not self.cursorVis
-            self.cursorTimer.start()
+    def set_active(self, state):
+        self.btn.pressed = state
+        self.chech_active()
 
     def chech_active(self):
-        was_active = self.active
         self.active = self.btn.update()
-        
-        if self.active != was_active:
-            if self.active:
-                self.pan.sub.color = (36, 37, 38)
-                self.cursorVis = True
-                self.cursorTimer.start()
-            else:
-                self.pan.sub.color = (18, 19, 20)
-                self.cursorVis = False
+        if self.active: self.pan.sub.color = (36, 37, 38)
+        else: self.pan.sub.color = (18, 19, 20)
 
-        
-    def update(self):
+    def input(self, index):  # index of the cursor
+        if Keys.is_held(Keys.control): return index
+        text = self.text.text
+        for event in Net.events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    if index > 0:
+                        text = text[:index - 1] + text[index:]
+                        index -= 1
+                elif event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
+                    continue
+                else:
+                    if event.unicode:  # Prevents non-printable keys (like Shift) from moving the cursor
+                        text = text[:index] + event.unicode + text[index:]
+                        index += len(event.unicode)
+
+        if text != self.text.text: self.text.set_text(text)
+        return index
+
+
+    def update(self, index: int):
         self.chech_active()
         if not self.active: return
-        self.update_cursor_vis()
+
+        self.i = self.input(index)
+        self.set_line()
+
 
     def render(self, screen):
-        self.pan.render(render_sub=False)
-        if self.active and self.cursorVis:
-            pygame.draw.line(self.pan.sub.screen, "white", (55+(self.cursorIndex*self.fntS), 0), (55+(self.cursorIndex*self.fntS), self.pan.dim.y))
-        self.pan.sub.render()
+        self.pan.render()
+
+    def get_line(self, lineIndex):
+        return getattr(Project, self._type+"s")[self.name]["code"][lineIndex]
+
+    def set_line(self):
+        text = getattr(Project, self._type+"s")[self.name]["code"][self.num-1]
+        if text != self.text.text: 
+            #print("modified")
+            getattr(Project, self._type+"s")[self.name]["changed"] = True
+            getattr(Project, self._type+"s")[self.name]["dirty"] = True
+            getattr(Project, self._type+"s")[self.name]["code"][self.num-1] = self.text.text
 

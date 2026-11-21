@@ -42,12 +42,28 @@ DEFAULTSCENE = {
     "objects": {},
     "imports": [],
     "dirty": True,
-    "changed": True
+    "changed": True,
+    "code": [
+        "from PyScene import *",
+        "import pygame",
+        "",
+        "class __name__(GameObj)",
+        "\tdef __init__(self):",
+        "\t\tsuper().__init__(Vector2D(0, 0))"
+    ]
 }
 
 DEFAULTOBJECT = {
     "name": "__name__",
     "imports": [],
     "dirty": True,
-    "changed": True
+    "changed": True,
+    "code": [
+        "from PyScene import *",
+        "import pygame",
+        "",
+        "class __name__(GameObj)",
+        "\tdef __init__(self):",
+        "\t\tsuper().__init__(Vector2D(0, 0))"
+    ]
 }

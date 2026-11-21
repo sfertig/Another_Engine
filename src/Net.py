@@ -179,6 +179,8 @@ class _project:
         data["name"] = name
         data["dirty"] = True
         data["changed"] = True
+        parent = "GameObj" if _type_ == "object" else "Scene"
+        data["code"][2] = f"class {name}({parent})"
 
         path = self.path+_type_+"s/"+name+".json"
         with open(path, "w") as f:
