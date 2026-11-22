@@ -110,7 +110,7 @@ class CodePannel:
         self.code.clear()
         #test
         y = 0
-        for i in range(5):
+        for i in range(len(getattr(Project, self._type+"s")[self.name]["code"])):
             self.code.append(self.pan.add_object(CodeLine(y, self.pan, i+1, self.name, self._type, self.font, self.fontSize, Project)))
             y+=self.code[-1].pan.dim.y
         self.pan.add_object(Rect(0, 0, self.pan.dim.x, self.pan.dim.y, (0, 0, 0), 2))

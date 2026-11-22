@@ -47,6 +47,9 @@ class CodeLine:
                         index -= 1
                 elif event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
                     continue
+                elif event.key == pygame.K_TAB:
+                    text = text[:index] + " "*4 + text[index:]
+                    index += 4
                 else:
                     if event.unicode:  # Prevents non-printable keys (like Shift) from moving the cursor
                         text = text[:index] + event.unicode + text[index:]
