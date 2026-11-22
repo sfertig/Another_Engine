@@ -26,6 +26,7 @@ class CodeLine:
         self.text = self.pan.add_object(Text(font, self.get_line(num-1), "white", Vector2D(55, self.pan.dim.y//2), "midleft"))
 
         self.active = False
+        self.DIRTY = False
 
     def set_active(self, state):
         self.btn.pressed = state
@@ -56,16 +57,19 @@ class CodeLine:
                         text = text[:index] + event.unicode + text[index:]
                         index += len(event.unicode)
 
-        if text != self.text.text: self.text.set_text(text)
+        if text != self.text.text: 
+            self.text.set_text(text)
+            self.DIRTY = True
         return index
 
 
     def update(self, index: int):
+        #self.DIRTY = False
         self.chech_active()
         if not self.active: return
 
         self.i = self.input(index)
-        self.set_line()
+        #self.set_line()
 
 
     def render(self, screen):
@@ -73,7 +77,8 @@ class CodeLine:
 
     def set_text(self, text):
         self.text.set_text(text)
-        self.set_line()
+        self.DIRTY = True
+        #self.set_line()
 
     def set_y(self, y):
         self.pan.pos.y = y
@@ -85,19 +90,39 @@ class CodeLine:
         self.num = num
         self._num.text.set_text(str(num))
 
-    def get_line(self, lineIndex):
-        code: list[str] = getattr(Project, self._type+"s")[self.name]["code"]
-        if lineIndex <= len(code)-1: return getattr(Project, self._type+"s")[self.name]["code"][lineIndex]
-        else: 
-            getattr(Project, self._type+"s")[self.name]["code"].append("")
-            return ""
+    def _get_object_data(self):
+        """Helper to fetch the object dictionary from Project safely."""
+        return getattr(Project, self._type + "s")[self.name]
 
+    def get_line(self, line_index: int) -> str:
+        """
+        Safely retrieves a line of code. Pads the list with empty strings 
+        if the requested line index doesn't exist yet, keeping Project as the source of truth.
+        """
+        obj_data = self._get_object_data()
+        code: list[str] = obj_data.setdefault("code", [])
+        
+        # Pad the list dynamically if index is out of bounds
+        while len(code) <= line_index:
+            code.append("")
+            
+        return code[line_index]
 
     def set_line(self):
-        text = getattr(Project, self._type+"s")[self.name]["code"][self.num-1]
-        if text != self.text.text: 
-            #print("modified")
-            getattr(Project, self._type+"s")[self.name]["changed"] = True
-            getattr(Project, self._type+"s")[self.name]["dirty"] = True
-            getattr(Project, self._type+"s")[self.name]["code"][self.num-1] = self.text.text
+        """
+        Safely updates a line of code in the Project data store.
+        Uses 1-based indexing for self.num (translating to 0-based list index).
+        """
+        obj_data = self._get_object_data()
+        code: list[str] = obj_data.setdefault("code", [])
+        
+        target_index = self.num - 1
+        
+        # Ensure the code list is long enough before modifying
+        while len(code) <= target_index:
+            code.append("")
+                    
+        obj_data["changed"] = True
+        obj_data["dirty"] = True
+        code[target_index] = self.text.text
 
