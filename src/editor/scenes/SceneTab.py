@@ -7,6 +7,7 @@ from ..Tabs._tab import Tab
 
 from ..objs.CodePannel import CodePannel
 from .TopBar import SceneTopBar
+from .VisualScene import VisualSceneEditor
 
 Project: _project = None
 
@@ -23,7 +24,11 @@ class SceneTab(Tab):
         self.bar = self.pan.add_object(SceneTopBar(self.pan))
 
         self.code = CodePannel(0, 10+self.bar.height, Net.screen_size.x, self.pan.dim.y-10-self.bar.height, name, "scene", project, self.pan)
+        self.vis = VisualSceneEditor(name, 10+self.bar.height, self.pan, Project, self.code)
         self.mode = "visual"
+
+        #debug
+        self.bar.toggle.pressed = True
 
     def set_mode(self):
         #keybinds
@@ -36,8 +41,10 @@ class SceneTab(Tab):
         self.bar.update()
 
         if self.mode == "coding": self.code.update()
+        else: self.vis.update()
 
     def _render(self):
         self.pan.render(render_sub=False)
         if self.mode == "coding": self.code.render(None)
+        else: self.vis.render()
         self.pan.sub.render()
