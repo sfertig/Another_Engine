@@ -7,6 +7,7 @@ from ...utils import *
 
 from .ManagerTab import ManagerTab
 from ..objs.ObjectTab import ObjTab
+from ..scenes.SceneTab import SceneTab
 from ._tab import Tab
 
 Project: _project = None
@@ -70,7 +71,7 @@ class TabManager:
         self._deactivate(self.lastActive)
 
         if _type_ == "object": self.tabs.append(self.pannel.add_object(ObjTab(self._y(), self.pannel.sub, name, self.r, Project)))
-        else: self.tabs.append(self.pannel.add_object(Tab(self._y(), name, self.pannel.sub, self.r, Project)))
+        else: self.tabs.append(self.pannel.add_object(SceneTab(self._y(), self.pannel.sub, name, self.r, Project)))
         self._activate(len(self.tabs)-1)
 
     def close(self, name, _type_):

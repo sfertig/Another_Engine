@@ -2,7 +2,7 @@
 .vscode/
 .pyscene
 
-build/
+
 dist/
 
 __pycache__/

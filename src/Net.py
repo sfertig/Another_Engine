@@ -182,6 +182,9 @@ class _project:
         parent = "GameObj" if _type_ == "object" else "Scene"
         data["code"][3] = f"class {name}({parent}):"
 
+        if _type_ == "scene":
+            data["code"][5] = f"        super().__init__(\"{name}\")"
+
         path = self.path+_type_+"s/"+name+".json"
         with open(path, "w") as f:
             json.dump(data, f, indent=4)

@@ -49,7 +49,13 @@ DEFAULTSCENE = {
         "",
         "class __name__(GameObj)",
         "    def __init__(self):",
-        "        super().__init__(Vector2D(0, 0))"
+        "        super().__init__(\"__name__\")",
+        "",
+        "    def update(self):",
+        "        pass",
+        "",
+        "    def render(self):",
+        "        pass"
     ]
 }
 
@@ -64,6 +70,12 @@ DEFAULTOBJECT = {
         "",
         "class __name__(GameObj)",
         "    def __init__(self):",
-        "        super().__init__(Vector2D(0, 0))"
+        "        super().__init__(Vector2D(0, 0))",
+        "",
+        "    def update(self):",
+        "        pass",
+        "",
+        "    def render(self, screen):",
+        "        pass"
     ]
 }
