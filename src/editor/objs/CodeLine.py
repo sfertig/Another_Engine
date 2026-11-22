@@ -5,6 +5,8 @@ from PyScene import Vector2D
 from ...Net import Net, _project
 from ...utils import *
 
+from .CodeHilighter import CodeHighlighter
+
 Project: _project = None
 
 class CodeLine:
@@ -19,7 +21,7 @@ class CodeLine:
         self._type = _type
 
         #test / debug
-        self._num = self.pan.add_object(btn(-50, 0, 100, fontSize+4,(18, 19, 20), str(num), font=font, sub=pan.sub, TextAlign="midleft"))
+        self._num = self.pan.add_object(btn(-50, 0, 100, fontSize+4,(18, 19, 20), str(num), font=font, sub=pan.sub, TextAlign="midleft", textColor=(133, 136, 137)))
         self.btn = btn(self.pos.x, y, pan.dim.x, fontSize+4, "black", sub=pan.sub, toggle=True, toggleSelf=False)
 
         self.fntS = fontSize
@@ -27,6 +29,8 @@ class CodeLine:
 
         self.active = False
         self.DIRTY = False
+        self.highlighter = CodeHighlighter()
+        self.highlight()
 
     def set_active(self, state):
         self.btn.pressed = state
@@ -54,7 +58,13 @@ class CodeLine:
                     index += 4
                 else:
                     if event.unicode:  # Prevents non-printable keys (like Shift) from moving the cursor
-                        text = text[:index] + event.unicode + text[index:]
+                        c = event.unicode
+                        if c == "\"": c+="\""
+                        elif c == "\'": c+="\'"
+                        elif c == "(": c+=")"
+                        elif c == "[": c+="]"
+                        elif c == "{": c+="}"
+                        text = text[:index] + c + text[index:]
                         index += len(event.unicode)
 
         if text != self.text.text: 
@@ -125,4 +135,9 @@ class CodeLine:
         obj_data["changed"] = True
         obj_data["dirty"] = True
         code[target_index] = self.text.text
+        self.highlight()
+
+    def highlight(self):
+        segments = self.highlighter.get_segments(self.text.text)
+        self.text.set_segments(segments)
 

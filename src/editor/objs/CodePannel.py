@@ -35,6 +35,11 @@ class CodePannel:
         self.cursory = 0
         self.cursorPos = [(55, 2), (55, self.code[-1].pan.dim.y)]
 
+        #key buffers
+        self.buf_back = 0
+
+        self.scroll_y = 0
+
     def set_cursor_pos(self):
         #set line pos
         w = self.code[-1].pan.dim.y
@@ -69,9 +74,13 @@ class CodePannel:
                 line.set_active(False)
                 self.code[self.cursory].set_active(True)
                 self.cursorIndex = len(self.code[self.cursory].text.text)
-                print("left", self.cursory, self.cursorIndex)
-
-        elif Keys.is_pressed(Keys.right): dir = 1
+        elif Keys.is_pressed(Keys.right): 
+            self.cursorIndex+=1
+            if self.cursorIndex > len(self.code[self.cursory].text.text) and self.cursory < len(self.code)-1:
+                self.cursory+=1
+                self.cursorIndex = 0
+                line.set_active(False)
+                self.code[self.cursory].set_active(True)
 
         
 
@@ -175,6 +184,7 @@ class CodePannel:
         self.pan.add_object(Rect(0, 0, self.pan.dim.x, self.pan.dim.y, (0, 0, 0), 2))
 
     def update(self):
+        self.update_buffers()
         active = None
         for line in self.code:
             line.update(self.cursorIndex)
@@ -185,7 +195,10 @@ class CodePannel:
 
         self._update_cursor(active)
         if Keys.is_pressed(Keys.enter): self.handle_enter()
-        elif Keys.is_pressed(Keys.backspace): self.handle_backspace()
+        if Keys.is_held(Keys.backspace) and self.buf_back == 0: 
+            self.handle_backspace()
+            self.buf_back = 1
+        elif not Keys.is_held(Keys.backspace): self.buf_back = 0
 
         if self.d:
             self.d = False
@@ -200,5 +213,9 @@ class CodePannel:
         if self.cursorVis: pygame.draw.line(self.pan.sub.screen, "white", *self.cursorPos, width=2)
         
         self.pan.sub.render()
+
+    def update_buffers(self):
+        self.buf_back -= 7*Net.dt
+        if self.buf_back < 0: self.buf_back = 0
 
 

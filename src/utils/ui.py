@@ -157,18 +157,41 @@ class Text:
     def __init__(self, font, text, color, pos=Vector2D(0, 0), align="center"):
         self.pos = pos
         self.font = font
-        if type(font) == int: self.font = pygame.font.Font(None, font)
+        if type(font) == int:
+            self.font = pygame.font.Font(None, font)
         self.text = text
         self.color = color
         self.align = align
+        self.segments = None
         self.surface = None
         self.rect = None
 
         self._update_surface()
 
     def _update_surface(self):
-        """Internal method to re-render surface only when text changes."""
-        self.surface = self.font.render(str(self.text), False, self.color)
+        """Internal method to re-render surface only when text or segments change."""
+        if not self.segments:
+            self.surface = self.font.render(str(self.text), False, self.color)
+        else:
+            rendered_chunks = []
+            total_width = 0
+            max_height = 0
+
+            for _, chunk_text, chunk_color in self.segments:
+                chunk_surf = self.font.render(chunk_text, False, chunk_color)
+                rendered_chunks.append(chunk_surf)
+                total_width += chunk_surf.get_width()
+                max_height = max(max_height, chunk_surf.get_height())
+
+            width = max(1, total_width)
+            height = max(1, max_height or self.font.get_height())
+            self.surface = pygame.Surface((width, height), pygame.SRCALPHA)
+
+            x_offset = 0
+            for chunk_surf in rendered_chunks:
+                self.surface.blit(chunk_surf, (x_offset, 0))
+                x_offset += chunk_surf.get_width()
+
         self._apply_alignment()
 
     def _apply_alignment(self):
@@ -191,12 +214,20 @@ class Text:
             # Multi-coordinate alignments (center, topleft, etc.) safely accept the full tuple
             self.rect = self.surface.get_rect(**{self.align: xy})
 
+    def set_segments(self, segments):
+        """Applies syntax highlighting segments and rebuilds the surface."""
+        if segments != self.segments:
+            self.segments = segments
+            self._update_surface()
+
     def set_text(self, new_text, color=None):
         """Only call this when the string actually changes!"""
+        color_changed = color is not None and color != self.color
         if color is not None:
             self.color = color
-        if new_text != self.text:
+        if new_text != self.text or color_changed:
             self.text = new_text
+            self.segments = None
             self._update_surface()
 
     def set_pos(self, new_pos: Vector2D):
@@ -205,6 +236,7 @@ class Text:
 
     def render(self, screen):
         screen.blit(self.surface, self.rect)
+
 
 #region Btn
 
