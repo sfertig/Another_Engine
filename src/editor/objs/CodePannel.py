@@ -106,6 +106,49 @@ class CodePannel:
         self.cursorVis = True
         self.cursorTimer.start()
 
+    def handle_backspace(self):
+        line: CodeLine = self.code[self.cursory]
+        text = line.text.text
+
+        # Case 1: Cursor is mid-line -> delete one character to the left
+        if self.cursorIndex > 0:
+            new_text = text[:self.cursorIndex - 1] + text[self.cursorIndex:]
+            line.set_text(new_text)
+            self.cursorIndex -= 1
+            self.cursorVis = True
+            self.cursorTimer.start()
+            return
+
+        # Case 2: Cursor is at start of line (cursorIndex == 0) and not on the first line -> merge up
+        if self.cursory > 0:
+            prev_line: CodeLine = self.code[self.cursory - 1]
+            prev_text = prev_line.text.text
+
+            # 1. Join current line's text onto the end of the previous line
+            new_cursor_x = len(prev_text)
+            prev_line.set_text(prev_text + text)
+            prev_line.set_active(True)
+
+            # 2. Remove the current line from self.code and self.pan
+            self.code.pop(self.cursory)
+            if hasattr(self.pan, "remove_object"):
+                self.pan.remove_object(line)
+            elif hasattr(self.pan, "objects") and line in self.pan.objects:
+                self.pan.objects.remove(line)
+
+            # 3. Shift all remaining lines below the merged line up
+            line_height = self.code[0].pan.dim.y
+            for idx, other_line in enumerate(self.code[self.cursory:], start=self.cursory):
+                other_line.set_y(idx * line_height)
+                other_line.set_num(idx + 1)
+
+            # 4. Update cursor position and timer
+            self.cursory -= 1
+            self.cursorIndex = new_cursor_x
+            self.cursorVis = True
+            self.cursorTimer.start()
+
+
     def gen(self):
         self.code.clear()
         #test
@@ -125,6 +168,7 @@ class CodePannel:
 
         self._update_cursor(active)
         if Keys.is_pressed(Keys.enter): self.handle_enter()
+        elif Keys.is_pressed(Keys.backspace): self.handle_backspace()
 
     def render(self, screen):
         self.pan.render(render_sub=False)

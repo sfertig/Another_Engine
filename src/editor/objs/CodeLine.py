@@ -41,10 +41,11 @@ class CodeLine:
         text = self.text.text
         for event in Net.events:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_BACKSPACE:
-                    if index > 0:
+                if event.key == pygame.K_BACKSPACE: 
+                    continue
+                    """if index > 0:
                         text = text[:index - 1] + text[index:]
-                        index -= 1
+                        index -= 1"""
                 elif event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
                     continue
                 elif event.key == pygame.K_TAB:
@@ -78,6 +79,7 @@ class CodeLine:
         self.pan.pos.y = y
         self.pos.y = y
         self.pan.sub.pos.y = y
+        self.btn.set_y(y)
 
     def set_num(self, num):
         self.num = num

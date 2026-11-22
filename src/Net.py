@@ -180,7 +180,7 @@ class _project:
         data["dirty"] = True
         data["changed"] = True
         parent = "GameObj" if _type_ == "object" else "Scene"
-        data["code"][3] = f"class {name}({parent})"
+        data["code"][3] = f"class {name}({parent}):"
 
         path = self.path+_type_+"s/"+name+".json"
         with open(path, "w") as f:

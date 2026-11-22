@@ -238,6 +238,10 @@ class btn:
         self.pos.x = x
         self.rect = pygame.Rect(self.pos.to_int(), self.dim.to_int())
         self.text.set_pos(Vector2D(x+self.dim.x//2, self.pos.y+self.dim.y//2))
+    def set_y(self, y):
+        self.pos.y = y
+        self.rect = pygame.Rect(self.pos.to_int(), self.dim.to_int())
+        self.text.set_pos(Vector2D(self.pos.x+self.dim.y//2, y+self.dim.y//2))
 
 
     def update(self):
