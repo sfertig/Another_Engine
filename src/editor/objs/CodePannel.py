@@ -59,6 +59,15 @@ class CodePannel:
             self.cursory = index + dir
             self.cursorVis = True
             self.cursorTimer.start()
+        #arrow keys (left / right)
+        if Keys.is_pressed(Keys.left): dir = -1
+        elif Keys.is_pressed(Keys.right): dir = 1
+        else: dir = 0
+        self.cursorIndex+=dir
+        if self.cursorIndex < 0 and self.cursorIndex>0: 
+            self.cursorIndex-=1 
+            self.cursorIndex = len(self.code[self.cursorIndex].text.text)
+        
 
     def _update_cursor(self, i):
         if i is None: 
@@ -147,7 +156,6 @@ class CodePannel:
             self.cursorIndex = new_cursor_x
             self.cursorVis = True
             self.cursorTimer.start()
-
 
     def gen(self):
         self.code.clear()
