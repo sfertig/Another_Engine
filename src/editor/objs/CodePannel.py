@@ -78,6 +78,34 @@ class CodePannel:
         self.cursor_navigation(line, i)
         self.set_cursor_pos()
 
+    def handle_enter(self):
+        line: CodeLine = self.code[self.cursory]
+        line.set_active(False)
+        # 1. Split the current line's text
+        text = line.text.text  # adjust if you have a getter/setter on Text
+        left_text = text[:self.cursorIndex]
+        right_text = text[self.cursorIndex:]
+        line.set_text(left_text)
+        #add line
+        y = (self.cursory+1)*self.code[0].pan.dim.y
+        new_line = CodeLine(
+            y, self.pan, line.num+1,
+            self.name, self._type, self.font, self.fontSize, Project
+        )
+        new_line.set_active(True)
+        new_line.set_text(right_text)
+        self.code.insert(self.cursory + 1, new_line)
+        self.pan.add_object(new_line)
+        
+        for idx, other_line in enumerate(self.code[self.cursory + 2:], start=self.cursory + 2):
+            other_line.set_y(idx * self.code[0].pan.dim.y)
+            other_line.set_num(idx + 1)
+
+        self.cursory+=1
+        self.cursorIndex = 0
+        self.cursorVis = True
+        self.cursorTimer.start()
+
     def gen(self):
         self.code.clear()
         #test
@@ -96,6 +124,7 @@ class CodePannel:
                 self.cursorIndex = line.i
 
         self._update_cursor(active)
+        if Keys.is_pressed(Keys.enter): self.handle_enter()
 
     def render(self, screen):
         self.pan.render(render_sub=False)

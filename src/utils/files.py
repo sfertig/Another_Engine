@@ -48,8 +48,8 @@ DEFAULTSCENE = {
         "import pygame",
         "",
         "class __name__(GameObj)",
-        "\tdef __init__(self):",
-        "\t\tsuper().__init__(Vector2D(0, 0))"
+        "    def __init__(self):",
+        "        super().__init__(Vector2D(0, 0))"
     ]
 }
 
@@ -63,7 +63,7 @@ DEFAULTOBJECT = {
         "import pygame",
         "",
         "class __name__(GameObj)",
-        "\tdef __init__(self):",
-        "\t\tsuper().__init__(Vector2D(0, 0))"
+        "    def __init__(self):",
+        "        super().__init__(Vector2D(0, 0))"
     ]
 }

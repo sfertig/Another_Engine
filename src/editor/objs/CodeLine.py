@@ -19,7 +19,7 @@ class CodeLine:
         self._type = _type
 
         #test / debug
-        self.pan.add_object(btn(-50, 0, 100, fontSize+4,(18, 19, 20), str(num), font=font, sub=pan.sub, TextAlign="midleft"))
+        self._num = self.pan.add_object(btn(-50, 0, 100, fontSize+4,(18, 19, 20), str(num), font=font, sub=pan.sub, TextAlign="midleft"))
         self.btn = btn(self.pos.x, y, pan.dim.x, fontSize+4, "black", sub=pan.sub, toggle=True, toggleSelf=False)
 
         self.fntS = fontSize
@@ -67,8 +67,26 @@ class CodeLine:
     def render(self, screen):
         self.pan.render()
 
+    def set_text(self, text):
+        self.text.set_text(text)
+        self.set_line()
+
+    def set_y(self, y):
+        self.pan.pos.y = y
+        self.pos.y = y
+        self.pan.sub.pos.y = y
+
+    def set_num(self, num):
+        self.num = num
+        self._num.text.set_text(str(num))
+
     def get_line(self, lineIndex):
-        return getattr(Project, self._type+"s")[self.name]["code"][lineIndex]
+        code: list[str] = getattr(Project, self._type+"s")[self.name]["code"]
+        if lineIndex <= len(code)-1: return getattr(Project, self._type+"s")[self.name]["code"][lineIndex]
+        else: 
+            getattr(Project, self._type+"s")[self.name]["code"].append("")
+            return ""
+
 
     def set_line(self):
         text = getattr(Project, self._type+"s")[self.name]["code"][self.num-1]

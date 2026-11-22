@@ -180,7 +180,7 @@ class _project:
         data["dirty"] = True
         data["changed"] = True
         parent = "GameObj" if _type_ == "object" else "Scene"
-        data["code"][2] = f"class {name}({parent})"
+        data["code"][3] = f"class {name}({parent})"
 
         path = self.path+_type_+"s/"+name+".json"
         with open(path, "w") as f:
@@ -206,6 +206,9 @@ class _project:
             os.remove(cPath)
 
         del getattr(self, _type_+"s")[name]
+        self.CLS_TB["check"] = True
+        self.CLS_TB["name"] = name
+        self.CLS_TB["type"] = _type_
         print("[Project] - "+_type_+" deleted: "+name)
 
 
