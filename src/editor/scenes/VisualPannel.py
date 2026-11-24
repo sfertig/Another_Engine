@@ -42,9 +42,10 @@ class VisualPannel:
         #self.gen()
 
     def gen(self):
-        print(self._objs)
+        #print(self._objs)
         for obj in self.objs:
-            obj.destroy()
+            try: obj.destroy()
+            except: pass
         self.objs.clear()
         builds = os.listdir(Project.path+"_buildcache_/")
         for k, v in self._objs.items():
@@ -57,9 +58,10 @@ class VisualPannel:
                 continue
             if "=" not in line: continue
             construct = line.split("=", 1)[1].strip()
-            print(construct)
+            #print(construct)
             cls = import_class_from_path(Project.path+"_buildcache_/"+_type+".py", _type)
-            self.objs.append(run_construct(cls, construct))
+            obj = run_construct(cls, construct)
+            if obj is not None: self.objs.append(obj)
             
 
     def handle_dragging(self):
@@ -104,7 +106,7 @@ class VisualPannel:
         self.screen.fill("black")
         self.grid.render(self.screen, self.cam)
         for obj in self.objs:
-            obj.render(self.screen, self.cam)
+            if obj is not None: obj.render(self.screen, self.cam)
         self.display.screen.blit(pygame.transform.scale(self.screen, self.display.dim.to_int()))
         self.display.render()
 
@@ -154,7 +156,11 @@ def run_construct(imported_cls, construct_str: str):
     # Extracts "player" from 'player(100, 100, "green")'
     call_name = construct_str.split("(", 1)[0].strip()    
     # Maps that exact name to your imported class and executes it
-    return eval(construct_str, {"__builtins__": {}}, {call_name: imported_cls})
+    try:
+        return eval(construct_str, {"__builtins__": {}}, {call_name: imported_cls})
+    except:
+        print("[ERROR] - NOTICE: an error was caught when creating an object, object will not be shown")
+        return None
 
 
 
