@@ -6,6 +6,8 @@ from PyScene import Vector2D
 from ...Net import Net, _project
 from ...utils import *
 
+from .VisualPannel import VisualPannel
+
 
 Project: _project = None
 
@@ -17,6 +19,7 @@ class VisualSceneEditor:
         self.pan = Pannel(0,  y, pan.dim.x, pan.dim.y-y, [29, 34, 41], displaySurface=pan.sub.screen, parent=pan.sub)
         self.code = code # <- may be used for objs in scene
         self.name = name
+        self.vis = self.pan.add_object(VisualPannel(300, 0, self.pan.dim.x-600, self.pan.dim.y, {}, self.pan, Project, name))
         self.gen()
 
     def gen(self):
@@ -47,14 +50,12 @@ class VisualSceneEditor:
 
                 objs[name] = [_type, getattr(Project, "scenes")[self.name]["code"].index(line)+1]
         #create objs
-        print(objs)
-
-                
-
-
+        self._objs = objs
+        self.vis._objs = objs
+        self.vis.gen()
 
     def update(self):
-        pass
+        self.vis.update()
 
     def render(self):
         self.pan.render()

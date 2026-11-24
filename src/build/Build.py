@@ -29,6 +29,7 @@ class BuildProject:
 
     def add_cache(self):
         for file in os.listdir(self.cache_path):
+            if not file.endswith(".py"): continue
             with open (self.cache_path+file, "r") as f:
                 data = f.read()
             self.write.line(data)

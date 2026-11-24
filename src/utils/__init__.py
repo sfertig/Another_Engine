@@ -6,7 +6,7 @@ from .Timer import Timer
 
 __all__ = [
     "get_path", "init_save_dir", "DEFAULTPROJECT",
-    "SubScreen",
+    "SubScreen", "clamp",
     "Pannel", "Text", "btn", "TextInput", "Line", "Rect",
     "Keys",
     "Timer",

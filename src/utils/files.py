@@ -75,7 +75,7 @@ DEFAULTOBJECT = {
         "    def update(self):",
         "        pass",
         "",
-        "    def render(self, screen):",
+        "    def render(self, screen, cam: Vector2D):",
         "        pass"
     ]
 }

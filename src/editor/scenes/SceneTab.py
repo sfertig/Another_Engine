@@ -4,6 +4,7 @@ import os
 from ...Net import Net, _project
 from ...utils import *
 from ..Tabs._tab import Tab
+from ...build.Build import BuildProject
 
 from ..objs.CodePannel import CodePannel
 from .TopBar import SceneTopBar
@@ -28,13 +29,22 @@ class SceneTab(Tab):
         self.mode = "visual"
 
         #debug
-        self.bar.toggle.pressed = True
+        #self.bar.toggle.pressed = True
 
     def set_mode(self):
         #keybinds
+        last = self.mode
         if Keys.is_pressed(Keys.f2): self.bar.toggle.pressed = not self.bar.toggle.pressed
-        if self.bar.toggle.pressed: self.mode = "coding"
-        else: self.mode = "visual"
+        if self.bar.toggle.pressed: 
+            self.mode = "coding"
+            if last == "visual": self.code.gen()
+        else: 
+            self.mode = "visual"
+            if last == "coding": 
+                Project.save()
+                BuildProject(Project.folder).gen()
+                Project._save_dirty()
+                self.vis.gen()
 
     def _update(self):
         self.set_mode()

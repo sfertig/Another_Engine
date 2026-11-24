@@ -34,3 +34,8 @@ class SubScreen:
 
     def render(self, cam: Vector2D = Vector2D(0, 0)):
         self._screen.blit(self.screen, (self.pos - cam).to_int())
+
+def clamp(value, _min, _max):
+    if value < _min: return _min
+    elif value > _max: return _max
+    else: return value

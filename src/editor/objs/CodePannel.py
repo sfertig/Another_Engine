@@ -26,19 +26,20 @@ class CodePannel:
         self.fontWidth = self.font.size("w")[0]
 
         self.code: list[CodeLine] = []
-        self.gen()
         self.d = False
 
         self.cursorTimer = Timer(0.5, True)
         self.cursorVis = False
         self.cursorIndex = 0
         self.cursory = 0
-        self.cursorPos = [(55, 2), (55, self.code[-1].pan.dim.y)]
 
         #key buffers
         self.buf_back = 0
 
         self.scroll_y = 0
+
+        self.gen()
+        self.cursorPos = [(55, 2), (55, self.code[-1].pan.dim.y)]
 
     def set_cursor_pos(self):
         #set line pos
@@ -182,6 +183,10 @@ class CodePannel:
             self.code.append(self.pan.add_object(CodeLine(y, self.pan, i+1, self.name, self._type, self.font, self.fontSize, Project)))
             y+=self.code[-1].pan.dim.y
         self.pan.add_object(Rect(0, 0, self.pan.dim.x, self.pan.dim.y, (0, 0, 0), 2))
+        self.cursorTimer.start()
+        self.cursorVis = True
+        self.cursorIndex = 0
+        self.cursory = 0
 
     def update(self):
         self.update_buffers()
