@@ -21,7 +21,7 @@ class CodePannel:
         self.name = name
         self._type = _type
 
-        self.fontSize = 46
+        self.fontSize = 40
         self.font = pygame.font.SysFont("consolas", self.fontSize)
         self.fontWidth = self.font.size("w")[0]
 
