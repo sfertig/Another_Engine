@@ -7,6 +7,7 @@ from ...Net import Net, _project
 from ...utils import *
 
 from .VisualPannel import VisualPannel
+from .objectPannel import ObjectsPannel
 import PyScene as py 
 
 
@@ -20,7 +21,9 @@ class VisualSceneEditor:
         self.pan = Pannel(0,  y, pan.dim.x, pan.dim.y-y, [29, 34, 41], displaySurface=pan.sub.screen, parent=pan.sub)
         self.code = code # <- may be used for objs in scene
         self.name = name
-        self.vis = self.pan.add_object(VisualPannel(300, 0, self.pan.dim.x-600, self.pan.dim.y, {}, self.pan, Project, name))
+        i = 400
+        self.objs = self.pan.add_object(ObjectsPannel(i-10, self.pan, Project, name))
+        self.vis = self.pan.add_object(VisualPannel(i, 0, self.pan.dim.x-i*2, self.pan.dim.y, {}, self.pan, Project, name))
         self.gen()
 
     def gen(self):
@@ -28,6 +31,7 @@ class VisualSceneEditor:
         start = False
         #search and define objects
         for line in getattr(Project, "scenes")[self.name]["code"]:
+            line: str
             if not start: #searching for init func
                 i = line.split("_")
                 if len(i)>3:
@@ -41,6 +45,7 @@ class VisualSceneEditor:
                 elif "=" not in line: continue
                 #chech that starts with self
                 elif "self" not in line: continue
+                elif line.strip()[0] == "#": continue
                 #now its a self.__ = __, so get name and type
                 name: str = line.split("=")[0].split(".")[1].replace(" ", "")
                 _type: str = line.split("=")[1]
@@ -54,9 +59,11 @@ class VisualSceneEditor:
         self._objs = objs
         self.vis._objs = objs
         self.vis.gen()
+        self.objs.gen(objs)
 
     def update(self):
         self.vis.update()
+        self.objs.update()
 
     def render(self):
         self.pan.render()
