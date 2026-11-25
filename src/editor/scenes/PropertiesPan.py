@@ -24,41 +24,75 @@ class Properties:
 
         self.line: str = Project.scenes[sceneName]["code"][lineNum-1].strip()
         #print(self.line)
-        self.get_inputs()
+        match = self.get_inputs()
+        print(match)
 
     def get_inputs(self):
         custom = not hasattr(py, self._type)
-        #get values
-        construct = self.line.split("=")[1].strip()
-        construct = construct.split("(")[1].replace(")", "")
-        values = []
-        for i in construct.split(","):
-            values.append(i.strip())
-        #get arg names
+        
+        # 1. Extract values from the constructor call string (e.g., player(16, 16, 32, 32, "yellow"))
+        construct = self.line.split("=")[1].strip() if "=" in self.line else self.line
+        try:
+            construct = construct.split("(")[1].replace(")", "")
+            values = [i.strip() for i in construct.split(",") if i.strip()]
+        except IndexError:
+            values = []
+
         names = []
-        func = ""
-        if custom: #custom obj, easy method!
-            for line in Project.objects[self.obj]["code"]:
-                line: str
-                i = line.split("_")
-                if len(i)>3:
-                    if line.split("_")[2] == "init":
-                        func = line.strip().split("(")[-1].replace(")", "").replace(":", "").strip()
+        types = {}
+
+        if custom:
+            # Custom object: parse __init__ signature via AST from stored code lines
+            code_content = "\n".join(Project.objects[self.obj].get("code", []))
+            try:
+                tree = ast.parse(code_content)
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.FunctionDef) and node.name == "__init__":
+                        for arg in node.args.args:
+                            arg_name = arg.arg
+                            if arg_name == "self":
+                                continue
+                            names.append(arg_name)
+                            
+                            if arg.annotation:
+                                try:
+                                    types[arg_name] = ast.unparse(arg.annotation)
+                                except Exception:
+                                    types[arg_name] = "undefined"
+                            else:
+                                types[arg_name] = "undefined"
                         break
-            for arg in func.split(","):
-                if arg.strip() != "self": names.append(arg.strip())
-        else: #pyscene obj, harder method
+            except SyntaxError:
+                pass
+                
+        else:
+            # PyScene object: use inspect module on compiled class
             obj = getattr(py, self._type)
             sig = inspect.signature(obj.__init__)
-            names = [name for name in sig.parameters if name != "self"]
+            for name, param in sig.parameters.items():
+                if name == "self":
+                    continue
+                names.append(name)
+                
+                if param.annotation != inspect.Parameter.empty:
+                    ann = param.annotation
+                    if hasattr(ann, "__name__"):
+                        types[name] = ann.__name__
+                    else:
+                        types[name] = str(ann)
+                else:
+                    types[name] = "undefined"
 
-        #match names and values
-        match = dict(zip(names, values))
-        print(match)
+        # 2. Only map names that have a corresponding value defined in the construct string
+        match = {}
+        for idx, name in enumerate(names):
+            if idx < len(values) and values[idx]:  # Checks that the value exists and isn't empty
+                val = values[idx]
+                t_str = types.get(name, "undefined")
+                match[name] = [val, t_str]
+
+        return match
             
-
-
-
     def update(self):
         pass
 
