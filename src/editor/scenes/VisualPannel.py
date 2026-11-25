@@ -1,6 +1,7 @@
 import pygame
 import os
 import importlib.util
+import importlib
 from pathlib import Path
 import sys
 import ast
@@ -11,6 +12,7 @@ from ...Net import Net, _project
 from ...utils import *
 
 import PyScene as py 
+from PyScene import *
 
 
 Project: _project = None
@@ -53,14 +55,17 @@ class VisualPannel:
             #print(line, v)
             #determine if file is built
             name, _type = k, v[0]
-            if _type+".py" not in builds:
+            if _type+".py" not in builds and not hasattr(py, _type):
                 print(f"[VisualScenePannel] - NOTICE: no build file found for {name} ({_type})")
                 continue
             if "=" not in line: continue
+
             construct = line.split("=", 1)[1].strip()
-            #print(construct)
-            cls = import_class_from_path(Project.path+"_buildcache_/"+_type+".py", _type)
-            obj = run_construct(cls, construct)
+            if hasattr(py, _type):
+                obj = run_construct(getattr(py, _type), construct)
+            else:                
+                cls = import_class_from_path(Project.path+"_buildcache_/"+_type+".py", _type)
+                obj = run_construct(cls, construct)
             if obj is not None: self.objs.append(obj)
             
 

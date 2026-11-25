@@ -45,6 +45,8 @@ class SceneTab(Tab):
                 BuildProject(Project.folder).gen()
                 Project._save_dirty()
                 self.vis.gen()
+        #handle reload
+        if Keys.is_held(Keys.control) and Keys.is_pressed(Keys.r): self.vis.gen()
 
     def _update(self):
         self.set_mode()

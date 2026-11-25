@@ -7,6 +7,7 @@ from ...Net import Net, _project
 from ...utils import *
 
 from .VisualPannel import VisualPannel
+import PyScene as py 
 
 
 Project: _project = None
@@ -46,7 +47,7 @@ class VisualSceneEditor:
                 if "(" not in _type: continue #dosnt create / define a GameObj
                 _type = _type.split("(")[0].replace(" ", "")
                 #check if type is a user created object (and later pyscene objects)
-                if _type not in Project.objects: continue
+                if _type not in Project.objects and not hasattr(py, _type): continue
 
                 objs[name] = [_type, getattr(Project, "scenes")[self.name]["code"].index(line)+1]
         #create objs
