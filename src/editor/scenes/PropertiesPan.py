@@ -25,7 +25,12 @@ class Properties:
         self.line: str = Project.scenes[sceneName]["code"][lineNum-1].strip()
         #print(self.line)
         match = self.get_inputs()
-        print(match)
+        self.args: list[InputSlice] = []
+        y = 5
+        for name, v in match.items():
+            self.args.append(self.pan.add_object(InputSlice(y, name, v[0], v[1], self.pan)))
+            y += self.args[-1].sub.dim.y+5
+        self.match = match
 
     def get_inputs(self):
         custom = not hasattr(py, self._type)
@@ -43,7 +48,7 @@ class Properties:
 
         if custom:
             # Custom object: parse __init__ signature via AST from stored code lines
-            code_content = "\n".join(Project.objects[self.obj].get("code", []))
+            code_content = "\n".join(Project.objects[self._type].get("code", []))
             try:
                 tree = ast.parse(code_content)
                 for node in ast.walk(tree):
@@ -92,9 +97,104 @@ class Properties:
                 match[name] = [val, t_str]
 
         return match
-            
+
+    def set_line(self):
+        line = f"        self.{self.obj} = {self._type}("
+        for arg in self.args:
+            line += str(arg.get_value())+", "
+        if len(self.args)>0: line = line[:-2]
+        line += ")"
+        Project.scenes[self.name]["code"][self.num] = line
+        Project.scenes[self.name]["dirty"] = True
+        Project.scenes[self.name]["changed"] = True
+
     def update(self):
-        pass
+        for arg in self.args:
+            arg.update()
+        #test / debug
+        for i in self.args:
+            if i.get_value() != self.match[i._name][0]:
+                self.set_line()
+                Project.RLD_VIS = True
+                break
 
     def render(self, screen):
         self.pan.render()
+
+class InputSlice:
+    def __init__(self, y, name, value, _type, pan: Pannel):
+        self.sub = SubScreen(5, y, pan.dim.x-10, 50, [29, 34, 41], pan.screen, pan.sub)
+        self.screen = self.sub.screen
+        self.name = Text(45, name+":", "white", Vector2D(3, 25), "midleft")
+        self._name = name
+        if _type in Types:
+            self.value = Types[_type](self.sub, _type, value)
+        else: self.value = Undefined(self.sub, _type, value)
+        self.default = value
+        
+    def get_value(self):
+        if type(self.value) != Undefined: 
+            return self.value.get_value()
+        else: return self.default
+
+    def update(self):
+        self.value.update()
+
+    def render(self, screen):
+        self.sub.clear()
+        self.name.render(self.screen)
+        self.value.render()
+        self.sub.render()
+
+
+#region Inputs
+class Input:
+    def __init__(self, sub, _type, value):
+        w = sub.dim.x//1.5-5
+        self.sub = SubScreen(sub.dim.x-w, 2, w, sub.dim.y-4, "black", sub.screen, sub)
+        self.height = self.sub.dim.y
+        self.screen = self.sub.screen
+        self.value = value
+        self._type = _type
+    def get_value(self): pass
+    def update(self): pass
+    def render(self): pass
+
+class IntInput(Input): 
+    def __init__(self, sub, _type, value):
+        super().__init__(sub, _type, value)
+        self.input = TextInput(btn(0, 0, self.sub.dim.x, self.sub.dim.y, "black", str(value), "white", self.height-5, "white", -1, 2, True, sub=self.sub))
+
+    def get_value(self): return int(self.input.btn.text.text)
+
+    def update(self):
+        self.input.update()
+        self.input.btn.text.set_text(format_int(self.input.btn.text.text))
+
+    def render(self):
+        self.sub.clear()
+        self.input.render(self.screen)
+        self.sub.render()
+class Undefined(Input):
+    def __init__(self, sub, _type, value):
+        super().__init__(sub, _type, value)
+        self.text = Text(self.height-5, "undefined", "white", Vector2D(self.sub.dim.x//2, self.sub.dim.y//2))
+
+    def render(self):
+        self.sub.clear()
+        self.text.render(self.screen)
+        self.sub.render()
+
+
+
+Types: dict[str, any] = {
+    "int": IntInput,
+
+}
+
+#region formats
+def format_int(text: str) -> str:
+    digits = "".join(char for char in text if char.isdigit() or char=="-")
+    return digits.lstrip("0") or "0"
+
+

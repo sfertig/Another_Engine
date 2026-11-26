@@ -103,6 +103,9 @@ class VisualPannel:
             self.screen = pygame.Surface((int(dw / self.zoom), int(dh / self.zoom)))
 
     def update(self):
+        if Project.RLD_VIS:
+            Project.RLD_VIS = False
+            self.gen()
         self.handle_dragging()
         self.handle_zoom()
 

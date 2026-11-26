@@ -87,6 +87,7 @@ class _project:
         #reload flags
         self.RLD_MANAGER = False #reloads managerTab fo new / del files
         self.RLD_SELF = False #reloads self
+        self.RLD_VIS = False #reloads visual scene
         self.OPN_TB = {"check": False, "type": None, "name": None}
         self.CLS_TB = {"check": False, "type": None, "name": None}
 
