@@ -23,6 +23,9 @@ class ObjectsPannel:
         self.prop: Properties = None
         self.last = None
 
+        self.creating = False
+        self.create: NewObj = None
+
     def gen(self, _objs):
         for obj in self.objs:
             self.pan.remove_object(obj)
@@ -31,6 +34,20 @@ class ObjectsPannel:
         for k, v in _objs.items():
             self.objs.append(self.pan.add_object(PanObj(y, k, v[0], self.pan, v[1])))
             y+=self.objs[-1].btn.dim.y+5
+        self._objs = _objs
+
+    def set_new_obj(self, name):
+        if name in self._objs: return #name already used
+        if len(self.objs)!=0: line = self.objs[-1].num
+        else: line = self.find_place()
+        Project.CHNG_NEWOBJ = {"check": True, "name": name, "line": line}
+
+    def find_place(self) -> int:
+        for line in getattr(Project, "scenes")[self.name]["code"]:
+            line: str
+            i = line.split("_")
+            if len(i)>3:
+                if line.split("_")[2] == "init": return Project.scenes[self.name]["code"].index(line)+2
             
     def update(self):
         i = False
@@ -46,9 +63,37 @@ class ObjectsPannel:
             self.prop = None
         elif self.prop is not None: self.prop.update()
 
+        if self.creating and self.create: 
+            self.create.update()
+            if not self.create.input.btn.pressed:
+                n = self.create.get()
+                self.creating = False
+                self.create = None
+                self.set_new_obj(n)
+        elif Keys.is_held(Keys.a) and Keys.is_pressed(Keys.a) and not self.creating:
+            self.creating = True
+            y = 5
+            if len(self.objs)!=0: y+=self.objs[-1].btn.dim.y+self.objs[-1].btn.pos.y
+            self.create = NewObj(y, self.pan)
 
     def render(self, screen):
-        self.pan.render()
+        self.pan.render(render_sub=False)
+        if self.creating and self.create: self.create.render(self.pan.screen)
+        self.pan.sub.render()
+
+class NewObj:
+    def __init__(self, y, pan: Pannel):
+        self.input = TextInput(btn(5, y, pan.dim.x-10, 50, [29, 34, 41], "", "white", 45, "white", -1, 2, True, sub=pan.sub))
+        self.input.btn.pressed = True
+
+    def get(self):
+        return self.input.btn.text.text
+
+    def update(self):
+        self.input.update()
+
+    def render(self, screen):
+        self.input.render(screen)
 
 class PanObj:
     def __init__(self, y, name, _type, pan: Pannel, num):

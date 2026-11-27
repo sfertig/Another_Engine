@@ -175,6 +175,26 @@ class IntInput(Input):
         self.sub.clear()
         self.input.render(self.screen)
         self.sub.render()
+
+class vector2dInput(Input):
+    def __init__(self, sub, _type, value):
+        super().__init__(sub, _type, value)
+        self.x = TextInput(btn(0, 0, self.sub.dim.x//2-5, self.sub.dim.y, "black", str(value[0]), "white", self.height-5, "white", -1, 2, True, sub=self.sub))
+        self.y = TextInput(btn(self.sub.dim.x//2+5, 0, self.sub.dim.x//2-5, self.sub.dim.y, "black", str(value[1]), "white", self.height-5, "white", -1, 2, True, sub=self.sub))
+        self.sub.color = [29, 34, 41]
+
+    def update(self):
+        self.x.update()
+        self.y.update()
+        self.x.btn.text.set_text(format_int(self.x.btn.text.text))
+        self.y.btn.text.set_text(format_int(self.y.btn.text.text))
+
+    def render(self):
+        self.sub.clear()
+        self.x.render(self.screen)
+        self.y.render(self.screen)
+        self.sub.render()
+
 class Undefined(Input):
     def __init__(self, sub, _type, value):
         super().__init__(sub, _type, value)
@@ -186,9 +206,9 @@ class Undefined(Input):
         self.sub.render()
 
 
-
 Types: dict[str, any] = {
     "int": IntInput,
+    "Vector2D": vector2dInput,
 
 }
 
@@ -196,5 +216,4 @@ Types: dict[str, any] = {
 def format_int(text: str) -> str:
     digits = "".join(char for char in text if char.isdigit() or char=="-")
     return digits.lstrip("0") or "0"
-
 

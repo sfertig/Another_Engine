@@ -90,6 +90,7 @@ class _project:
         self.RLD_VIS = False #reloads visual scene
         self.OPN_TB = {"check": False, "type": None, "name": None}
         self.CLS_TB = {"check": False, "type": None, "name": None}
+        self.CHNG_NEWOBJ = {"check": False, "name": None, "line": 0}
 
     def load(self):
         with open(self.path+"_project.json", "r") as f:

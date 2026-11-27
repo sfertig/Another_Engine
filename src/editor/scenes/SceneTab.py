@@ -19,6 +19,7 @@ class SceneTab(Tab):
 
         super().__init__(x, name, sub, rect, Project, True)
         self._type_ = "scene"
+        self.name = name
 
         self.pan = Pannel(0, Net._y, Net.screen_size.x, Net.screen_size.y-Net._y, [29, 34, 41], displaySurface=Net.screen)
         self.pan.add_object(Line(20, 2, self.pan.dim.x-20, 2))
@@ -53,7 +54,22 @@ class SceneTab(Tab):
         self.bar.update()
 
         if self.mode == "coding": self.code.update()
-        else: self.vis.update()
+        else: 
+            self.vis.update()
+            if Project.CHNG_NEWOBJ["check"]:
+                Project.CHNG_NEWOBJ["check"] = False
+                #add line
+                i = f"        self.{Project.CHNG_NEWOBJ["name"]} = "
+                Project.scenes[self.name]["code"].insert(Project.CHNG_NEWOBJ["line"], i)
+                #change mode
+                self.mode = "coding"
+                self.bar.toggle.pressed = True
+                self.code.gen()
+                self.code.cursory = Project.CHNG_NEWOBJ["line"]
+                self.code.cursorIndex = len(i)
+                self.code.set_cursor_pos()
+                self.code.code[self.code.cursory].set_active(True)
+
 
     def _render(self):
         self.pan.render(render_sub=False)
