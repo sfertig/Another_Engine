@@ -4,6 +4,7 @@ import os
 import shutil
 import json
 from PyScene import Vector2D
+import copy
 
 from ..utils import *
 from ..Net import Net
@@ -85,7 +86,7 @@ class TopBar:
             os.mkdir(p+"_buildcache_")
             #make engine file
             n = name.split(".")[0]
-            data = DEFAULTPROJECT.copy()
+            data = copy.deepcopy(DEFAULTPROJECT)
             data["project_name"] = n
             data["version"] = Net.VERSION
             data["window"]["title"] = n

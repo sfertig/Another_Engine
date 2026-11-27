@@ -3,6 +3,7 @@ import os
 import sys
 from PyScene import Vector2D
 import json
+import copy
 
 from .utils import DEFAULTPROJECT, DEFAULTSCENE, DEFAULTOBJECT
 
@@ -177,7 +178,7 @@ class _project:
         return False
 
     def new(self, name, _type_):
-        data = DEFAULTSCENE if _type_ == "scene" else DEFAULTOBJECT
+        data = copy.deepcopy(DEFAULTSCENE) if _type_ == "scene" else copy.deepcopy(DEFAULTOBJECT)
         data["name"] = name
         data["dirty"] = True
         data["changed"] = True
